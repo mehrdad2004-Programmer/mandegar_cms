@@ -28,6 +28,7 @@ return new class extends Migration
                 "phone_no",
                 "telephone",
                 "address",
+                "mianpaye",
                 "personal_pic"
             ];
 
@@ -36,6 +37,9 @@ return new class extends Migration
             foreach($cols as $col){
                 if($col == "id_no"){
                     $table->string($prefix . $col)->unique();
+                    continue;
+                }else if($col == "mianpaye"){
+                    $table->string("mianpaye")->default("0");
                     continue;
                 }
                 $table->string($prefix . $col);
