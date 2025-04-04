@@ -4,6 +4,8 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 
+use App\Models\StudentPersonalInfoModel;
+
 class StudentEducationalInfoModel extends Model
 {
     protected $table = "st_educational_info";
@@ -15,4 +17,8 @@ class StudentEducationalInfoModel extends Model
         "last_karname",
         "st_id_no"
     ];
+
+    public function educational_info(){
+        return $this->belongsTo(StudentPersonalInfoModel::class, "st_id_no", "st_id_no");
+    }
 }
