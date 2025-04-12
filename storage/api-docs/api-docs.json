@@ -1,0 +1,252 @@
+{
+    "openapi": "3.0.0",
+    "info": {
+        "title": "Mandegar Mehr Registration System",
+        "description": "Description of your API",
+        "version": "1.0.0"
+    },
+    "paths": {
+        "/api/registration/register": {
+            "post": {
+                "tags": [
+                    "Registration"
+                ],
+                "summary": "جهت ثبت نام دانش آموزان",
+                "description": "جهت ثبت نام دانش آموزان",
+                "operationId": "ef7feb3a45a8e2ee27cf1dbe7bb1a20a",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "name",
+                                    "description"
+                                ],
+                                "properties": {
+                                    "st_fname": {
+                                        "type": "string"
+                                    },
+                                    "st_lname": {
+                                        "type": "string"
+                                    },
+                                    "st_faname": {
+                                        "type": "string"
+                                    },
+                                    "st_id_no": {
+                                        "type": "string"
+                                    },
+                                    "st_birthdate": {
+                                        "type": "string"
+                                    },
+                                    "st_birth_place": {
+                                        "type": "string"
+                                    },
+                                    "st_grade": {
+                                        "type": "string"
+                                    },
+                                    "st_field": {
+                                        "type": "string"
+                                    },
+                                    "st_exp_place": {
+                                        "type": "string"
+                                    },
+                                    "st_serial": {
+                                        "type": "string"
+                                    },
+                                    "st_phone_no": {
+                                        "type": "string"
+                                    },
+                                    "st_telephone": {
+                                        "type": "string"
+                                    },
+                                    "st_address": {
+                                        "type": "string"
+                                    },
+                                    "mianpaye": {
+                                        "type": "string"
+                                    },
+                                    "personal_pic": {
+                                        "type": "string"
+                                    },
+                                    "mo_fname": {
+                                        "type": "string"
+                                    },
+                                    "mo_lname": {
+                                        "type": "string"
+                                    },
+                                    "mo_job": {
+                                        "type": "string"
+                                    },
+                                    "mo_phone": {
+                                        "type": "string"
+                                    },
+                                    "mo_id_no": {
+                                        "type": "string"
+                                    },
+                                    "mo_education": {
+                                        "type": "string"
+                                    },
+                                    "mo_work_address": {
+                                        "type": "string"
+                                    },
+                                    "fa_fname": {
+                                        "type": "string"
+                                    },
+                                    "fa_lname": {
+                                        "type": "string"
+                                    },
+                                    "fa_job": {
+                                        "type": "string"
+                                    },
+                                    "fa_id_no": {
+                                        "type": "string"
+                                    },
+                                    "fa_education": {
+                                        "type": "string"
+                                    },
+                                    "fa_work_address": {
+                                        "type": "string"
+                                    },
+                                    "last_school": {
+                                        "type": "string"
+                                    },
+                                    "last_avrage": {
+                                        "type": "number",
+                                        "format": "float"
+                                    },
+                                    "last_karname": {
+                                        "type": "string"
+                                    },
+                                    "last_enzebat": {
+                                        "type": "number",
+                                        "format": "float"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "201": {
+                        "description": "Resource created successfully",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "msg": {
+                                            "type": "string"
+                                        },
+                                        "tracking_code": {
+                                            "type": "string"
+                                        },
+                                        "statuscode": {
+                                            "type": "integer"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Invalid input data"
+                    },
+                    "500": {
+                        "description": "Server error"
+                    }
+                }
+            }
+        },
+        "/api/registration/getData": {
+            "get": {
+                "tags": [
+                    "Get_Data"
+                ],
+                "summary": "گرفتن داده های دانش آموزان ثبت نام شده",
+                "description": "This endpoint retrieves an example entry by its unique identifier.",
+                "operationId": "getExample",
+                "responses": {
+                    "200": {
+                        "description": "گرفتن تمامی داده ها",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "data": {
+                                            "type": "object"
+                                        },
+                                        "statuscode": {
+                                            "type": "integer"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Server error"
+                    }
+                }
+            }
+        },
+        "/api/registration/setStatus": {
+            "patch": {
+                "tags": [
+                    "SET STATUS"
+                ],
+                "summary": "تغییر وضعیت و گردش کار دانش آموز",
+                "operationId": "f69ff6833b3c0d9c1abf0521457b8049",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "st_id_no",
+                                    "status"
+                                ],
+                                "properties": {
+                                    "st_id_no": {
+                                        "type": "string"
+                                    },
+                                    "status": {
+                                        "type": "string"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Resource updated successfully"
+                    },
+                    "400": {
+                        "description": "Invalid input data"
+                    },
+                    "500": {
+                        "description": "Server error"
+                    }
+                }
+            }
+        }
+    },
+    "tags": [
+        {
+            "name": "Registration",
+            "description": "Registration"
+        },
+        {
+            "name": "Get_Data",
+            "description": "Get_Data"
+        },
+        {
+            "name": "SET STATUS",
+            "description": "SET STATUS"
+        }
+    ]
+}

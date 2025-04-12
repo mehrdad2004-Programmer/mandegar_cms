@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use Exception;
 use Illuminate\Http\Request;
 
 //USING MODEL TO REGISTER
@@ -13,15 +14,100 @@ use App\Models\StudentMotherInfoModel;
 use App\Models\StudentPersonalInfoModel;
 
 use Illuminate\Support\Facades\DB;
-
+    /**
+     * @OA\Info(
+     *    title="Mandegar Mehr Registration System",
+     *    description="Description of your API",
+     *    version="1.0.0",
+     * )
+     */
 class RegistrationController extends Controller
 {
-    public function register(Request $request){
+
+    public function UniqueCode(){
         try{
+            $id = StudentPersonalInfoModel::orderBy('id', 'desc')->pluck('id')->first();
+            if($id){
+                return $id + 1;
+            }
+            return 1000;
+        }catch(Exception $e){
+            dd($e->getMessage());
+        }
+
+    }
+    /**
+     * @OA\Post(
+     *     path="/api/registration/register",
+     *     tags={"Registration"},
+     *     summary="جهت ثبت نام دانش آموزان",
+     *     description="جهت ثبت نام دانش آموزان",
+     *     @OA\RequestBody(
+     *         required=true,
+     *         @OA\JsonContent(
+     *             required={"name", "description"},
+     *             @OA\Property(property="st_fname", type="string"),
+     *             @OA\Property(property="st_lname", type="string"),
+     *             @OA\Property(property="st_faname", type="string"),
+     *             @OA\Property(property="st_id_no", type="string"),
+     *             @OA\Property(property="st_birthdate", type="string"),
+     *             @OA\Property(property="st_birth_place", type="string"),
+     *             @OA\Property(property="st_grade", type="string"),
+     *             @OA\Property(property="st_field", type="string"),
+     *             @OA\Property(property="st_exp_place", type="string"),
+     *             @OA\Property(property="st_serial", type="string"),
+     *             @OA\Property(property="st_phone_no", type="string"),
+     *             @OA\Property(property="st_telephone", type="string"),
+     *             @OA\Property(property="st_address", type="string"),
+     *             @OA\Property(property="mianpaye", type="string"),
+     *             @OA\Property(property="personal_pic", type="string"),
+     *             @OA\Property(property="mo_fname", type="string"),
+     *             @OA\Property(property="mo_lname", type="string"),
+     *             @OA\Property(property="mo_job", type="string"),
+     *             @OA\Property(property="mo_phone", type="string"),
+     *             @OA\Property(property="mo_id_no", type="string"),
+     *             @OA\Property(property="mo_education", type="string"),
+     *             @OA\Property(property="mo_work_address", type="string"),
+     *             @OA\Property(property="fa_fname", type="string"),
+     *             @OA\Property(property="fa_lname", type="string"),
+     *             @OA\Property(property="fa_job", type="string"),
+     *             @OA\Property(property="fa_id_no", type="string"),
+     *             @OA\Property(property="fa_education", type="string"),
+     *             @OA\Property(property="fa_work_address", type="string"),
+     *             @OA\Property(property="last_school", type="string"),
+     *             @OA\Property(property="last_avrage", type="float"),
+     *             @OA\Property(property="last_karname", type="string"),
+     *             @OA\Property(property="last_enzebat", type="float")
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=201,
+     *         description="Resource created successfully",
+     *         @OA\JsonContent(
+     *             @OA\Property(property="msg", type="string"),
+     *             @OA\Property(property="tracking_code", type="string"),
+     *             @OA\Property(property="statuscode", type="integer"),
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=400,
+     *         description="Invalid input data"
+     *     ),
+     *     @OA\Response(
+     *         response=500,
+     *         description="Server error"
+     *     )
+     * )
+     */
+
+    public function register(Request $request)
+    {
+        $tr_code = $this->UniqueCode();
+        try {
             $ST_PREFIX = "st_";
             $MO_PREFIX = "mo_";
             $FA_PREFIX = "fa_";
-        
+
             $st_personal_info = [
                 $ST_PREFIX . "fname" => $request->input($ST_PREFIX . "fname"),
                 $ST_PREFIX . "lname" => $request->input($ST_PREFIX . "lname"),
@@ -70,17 +156,18 @@ class RegistrationController extends Controller
             ];
 
             $mrs_workflow = [
-                "st_id_no",
-                "mrs_status",
-                "datetime",
+                "st_id_no" => $request->st_id_no,
+                "tracking_code" => $tr_code,
+                "mrs_status" => "0",
+                "datetime" => "99/99/99", //replace with real one
             ];
 
             $mrs_access_logs = [
-                "st_id_no",
-                "ip_address",
-                "user_agent",
-                "date",
-                "time"
+                "st_id_no" => $request->st_id_no,
+                "ip_address" => $request->ip(),
+                "user_agent" => $request->userAgent(),
+                "date" => "99/99/99",
+                "time" => "99:99:99"
             ];
 
             $upload_contents = [
@@ -97,7 +184,7 @@ class RegistrationController extends Controller
 
             $kar_uploaded = $request->file("last_karname")->storeAs("karname/" . $request->st_grade, $request->st_id_no . $request->file("last_karname")->getClientOriginalExtension());
 
-            if($pic_uploaded && $kar_uploaded){
+            if ($pic_uploaded && $kar_uploaded) {
                 //INSERTING INTO TABLES
                 MrsAccessLogsModel::create($mrs_access_logs);
                 MrsWorkflowModel::create($mrs_workflow);
@@ -109,7 +196,8 @@ class RegistrationController extends Controller
                 DB::commit();
                 return response()->json([
                     "msg" => "registered",
-                    "statuscode" => 201
+                    "statuscode" => 201,
+                    "tracking_code" => $tr_code
                 ], 201);
             }
             DB::rollBack();
@@ -118,7 +206,7 @@ class RegistrationController extends Controller
                 "statuscode" => 400
             ], 400);
 
-        }catch(\Exception $e){
+        } catch (Exception $e) {
             DB::rollBack();
             return response()->json([
                 "error" => $e->getMessage(),
@@ -127,9 +215,32 @@ class RegistrationController extends Controller
         }
     }
 
+    /**
+     * @OA\Get(
+     *     path="/api/registration/getData",
+     *     operationId="getExample",
+     *     tags={"Get_Data"},
+     *     summary="گرفتن داده های دانش آموزان ثبت نام شده",
+     *     description="This endpoint retrieves an example entry by its unique identifier.",
+     *     @OA\Response(
+     *         response=200,
+     *         description="گرفتن تمامی داده ها",
+     *         @OA\JsonContent(
+     *             @OA\Property(property="data", type="object"),
+     *             @OA\Property(property="statuscode", type="integer")
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=500,
+     *         description="Server error"
+     *     )
+     * )
+     */
 
-    public function getStudentData(){
-        try{
+
+    public function getStudentData()
+    {
+        try {
             $data = StudentPersonalInfoModel::with([
                 "mother_info",
                 "father_info",
@@ -142,21 +253,49 @@ class RegistrationController extends Controller
                 "data" => $data,
                 "statuscode" => 200
             ], 200);
-        }catch(\Exception $e){
+        } catch (\Exception $e) {
             return response()->json([
                 "error" => $e->getMessage(),
                 "statuscode" => 500
             ], 500);
         }
     }
+    /**
+     * @OA\Patch(
+     *     path="/api/registration/setStatus",
+     *     tags={"SET STATUS"},
+     *     summary="تغییر وضعیت و گردش کار دانش آموز",
+     *     @OA\RequestBody(
+     *         required=true,
+     *         @OA\JsonContent(
+     *             required={"st_id_no", "status"},
+     *             @OA\Property(property="st_id_no", type="string"),
+     *             @OA\Property(property="status", type="string"),
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=200,
+     *         description="Resource updated successfully",
+     *     ),
+     *     @OA\Response(
+     *         response=400,
+     *         description="Invalid input data"
+     *     ),
+     *     @OA\Response(
+     *         response=500,
+     *         description="Server error"
+     *     )
+     * )
+     */
 
-    public function setStatus(Request $request){
-        try{
+    public function setStatus(Request $request)
+    {
+        try {
             $updated = MrsWorkflowModel::where("st_id_no", $request->st_id_no)->update([
                 "mrs_status" => $request->status
             ]);
 
-            if($updated){
+            if ($updated) {
                 return response()->json([
                     "msg" => "updated",
                     "statuscode" => 200
@@ -167,7 +306,7 @@ class RegistrationController extends Controller
                 "msg" => "could not update",
                 "statuscode" => 400
             ], 400);
-        }catch(\Exception $e){
+        } catch (\Exception $e) {
             return response()->json([
                 "error" => $e->getMessage(),
                 "statuscode" => 500
